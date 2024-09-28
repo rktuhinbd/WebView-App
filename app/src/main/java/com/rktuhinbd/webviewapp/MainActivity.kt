@@ -1,7 +1,10 @@
 package com.rktuhinbd.webviewapp
 
 import android.os.Bundle
+import android.webkit.WebView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import com.rktuhinbd.webviewapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -13,8 +16,9 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
 
-        setContentView(binding.root)
+        enableEdgeToEdge()
 
+        setContentView(binding.root)
 
         initWebView()
     }
@@ -26,11 +30,16 @@ class MainActivity : AppCompatActivity() {
         binding.webView.webViewClient =
             MyWebViewClient(this, binding.progressBar, binding.lottieAnimationView)
 
+        resetWebView(binding.webView)
+
         // this will load the url of the website
         binding.webView.loadUrl(BuildConfig.webUrl)
 
         // this will enable the javascript settings, it can also allow xss vulnerabilities
-        binding.webView.settings.javaScriptEnabled = true
+        binding.webView.settings.javaScriptEnabled = false
+
+        binding.webView.settings.loadWithOverviewMode = true
+        binding.webView.settings.useWideViewPort = true
 
         // if you want to enable zoom feature
         binding.webView.settings.setSupportZoom(true)
@@ -38,12 +47,18 @@ class MainActivity : AppCompatActivity() {
 
     // if you press Back button this code will work
     override fun onBackPressed() {
-        // if your webview can go back it will go back
+        // if your web view can go back it will go back
         if (binding.webView.canGoBack())
             binding.webView.goBack()
-        // if your webview cannot go back
+        // if your web view cannot go back
         // it will exit the application
         else
             super.onBackPressed()
     }
+}
+
+fun resetWebView(webView: WebView) {
+    webView.clearCache(true)   // Clears the entire cache
+    webView.clearHistory()     // Clears the browsing history
+    webView.clearFormData()    // Clears any stored form data
 }

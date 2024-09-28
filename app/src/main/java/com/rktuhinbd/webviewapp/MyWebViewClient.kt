@@ -2,6 +2,8 @@ package com.rktuhinbd.webviewapp
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.util.Log
 import android.view.View
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -15,7 +17,6 @@ class MyWebViewClient(
     private val progressBar: ProgressBar,
     private val errorAnim: LottieAnimationView
 ) : WebViewClient() {
-    @Deprecated("Deprecated in Java")
     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
         if (url != null) {
             if (url.contains("intent://")) {
@@ -26,6 +27,11 @@ class MyWebViewClient(
             }
         }
         return super.shouldOverrideUrlLoading(view, url)
+    }
+    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        super.onPageStarted(view, url, favicon)
+        progressBar.visibility = View.VISIBLE
+        errorAnim.visibility = View.GONE // Hide error animation when a new page starts loading
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
@@ -38,7 +44,7 @@ class MyWebViewClient(
         request: WebResourceRequest?,
         error: WebResourceError?
     ) {
-        if (error?.errorCode == ERROR_HOST_LOOKUP) {
+        if (error?.errorCode == ERROR_CONNECT) {
             errorAnim.visibility = View.VISIBLE
             progressBar.visibility = View.GONE
             view?.loadUrl("about:blank")
